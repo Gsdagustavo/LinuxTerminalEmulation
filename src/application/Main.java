@@ -1,23 +1,22 @@
 package application;
 
+
+import util.DirectorySystem;
 import java.util.Scanner;
 
 public class Main {
 
     public static Scanner sc = new Scanner(System.in);
-    public static String[] commands = new String[2];
 
     public static void main(String[] args) {
 
-        commands[0] = "echo";
-        commands[1] = "clear";
+        DirectorySystem dirSys = new DirectorySystem();
 
         while (true)  {
             showInputLine();
             String input = sc.nextLine();
 
             int returnCode = validateCommand(input);
-//            System.out.println(returnCode);
         }
 
     }
@@ -32,27 +31,68 @@ public class Main {
         String firsArgument = arguments[0];
 
         // Execute commands based on the command and arguments received
-        for (int i = 0; i < commands.length; i++) {
+        // GENERIC COMMANDS
 
-            // Echo command
-            if (firsArgument.compareTo("echo") == 0) {
-                echoCommand(arguments);
-                return 0;
+        // Echo command
+        if (firsArgument.compareTo("echo") == 0) {
+            echoCommand(arguments);
+            return 0;
 
-            // Clear command
-            } else if (firsArgument.compareTo("clear") == 0) {
-                clearCommand();
-                return 0;
-            } else if (firsArgument.compareTo("exit") == 0) {
+        }
 
+        // Clear command
+        if (firsArgument.compareTo("clear") == 0) {
+            clearCommand();
+            return 0;
+        }
+
+        // Exit command
+        if (firsArgument.compareTo("exit") == 0) {
+            String argument = " ";
+
+            if (arguments.length == 2) {
+                if (arguments[1].compareTo("now") == 0) {
+                    argument = "now";
+                }
             }
+
+            exitCommand(argument);
+        }
+
+        // DIRECTORY MANIPULATION COMMANDS
+
+        // Creates a directory
+        if (firsArgument.compareTo("mkdir") == 0) {
+            String dirName = new String();
+
+            if (arguments.length == 1) {
+                System.out.print("Enter directory name: ");
+                dirName = sc.nextLine();
+
+                System.out.println("Directory with name '" + dirName + "' created.");
+                return 0;
+            } else {
+
+                for (int i = 0; i < arguments.length; i++) {
+                    if (i == 0) { continue; }
+
+                    dirName += (arguments[i]);
+
+                    if (!((arguments.length - 1) - i == 0)) {
+                        dirName += " ";
+                    }
+                }
+            }
+            System.out.println("Directory with name '" + dirName + "' created.");
+            wait(100);
+            return 0;
         }
 
         if (userInput.isBlank()) {
             return -1;
         }
 
-        System.err.println(userInput + " command not recognized.");
+        System.err.println(userInput.strip() + " command not recognized.");
         wait(100);
 
         return -1;
@@ -92,7 +132,21 @@ public class Main {
         return 0;
     }
 
-    public static int exitCommand(String[] args) {
-        
+    public static int exitCommand(String arg) {
+
+        // 0 means shutdown in 10 seconds
+        // -1 means the command was not executed successfully
+        // 1 means shutdown now
+
+        if (arg.compareTo("now") == 0) {
+            System.exit(1);
+            return 0;
+        } else if (arg.compareTo(" ") == 0) {
+            wait(3 * 1000);
+            System.exit(1);
+            return 0;
+        }
+
+        return -1;
     }
 }
